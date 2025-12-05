@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import pool from '@/lib/db';
 
 interface Confession {
   id: number;
@@ -13,16 +12,16 @@ export default function Wall() {
   const [confessions, setConfessions] = useState<Confession[]>([]);
 
   async function fetchUnlocked() {
-    const client = await pool.connect();
     try {
-      const { rows } = await client.query(
-        `SELECT id, text, count FROM confessions 
-         WHERE is_published = TRUE AND cluster_id IS NULL AND expires_at > NOW() 
-         ORDER BY unlocked_at DESC LIMIT 50`
-      );
-      setConfessions(rows);
-    } finally {
-      client.release();
+      const res = await fetch('/api/confessions');
+      if (res.ok) {
+        const data = await res.json();
+        setConfessions(data);
+      } else {
+        setConfessions([]);
+      }
+    } catch {
+      setConfessions([]);
     }
   }
 

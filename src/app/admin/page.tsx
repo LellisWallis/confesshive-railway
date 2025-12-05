@@ -7,6 +7,19 @@ export default function Admin() {
   const [text, setText] = useState('');
   const [showForm, setShowForm] = useState(false);
 
+  async function handleLogin() {
+    const res = await fetch('/api/admin-auth', {
+      method: 'POST',
+      body: JSON.stringify({ password }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (res.ok) {
+      setShowForm(true);
+    } else {
+      alert('Wrong password!');
+    }
+  }
+
   if (!showForm) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -16,12 +29,18 @@ export default function Admin() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           onKeyPress={(e) => {
-            if (e.key === 'Enter' && password === 'hive123') { // Bogrensvag58
-              setShowForm(true);
+            if (e.key === 'Enter') {
+              handleLogin();
             }
           }}
           className="p-2 border rounded"
         />
+        <button
+          onClick={handleLogin}
+          className="ml-2 bg-purple-700 text-white py-2 px-4 rounded"
+        >
+          Login
+        </button>
       </div>
     );
   }
